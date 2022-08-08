@@ -2,40 +2,37 @@ import '../css/common.css';
 import '../css/03-feedback.css';
 import throttle from 'lodash.throttle';
 
-const STORAGE_KEY = 'feedback-form-state';
 const refs = {
   form: document.querySelector('.feedback-form'),
-  textarea: document.querySelector('.feedback-form textarea'),
-  input: document.querySelector('input'),
+  email: document.querySelector('input'),
+  message: document.querySelector('textarea'),
 };
-const formData = {};
+const LOCALSTORAGE_KEY = 'feedback-form-state';
 
-populateTextarea();
+refreshPage();
 
-refs.form.addEventListener('input', throttle(onTextareaInput, 500));
+refs.form.addEventListener('input', throttle(saveDataToLocStor, 500));
+refs.form.addEventListener('submit', submitForm);
 
-refs.form.addEventListener('submit', e => {
-  e.preventDefault();
-  e.currentTarget.reset();
-  const objData = JSON.parse(localStorage.getItem(STORAGE_KEY));
-  localStorage.removeItem(STORAGE_KEY);
-});
-
-function onTextareaInput(e) {
-  formData[e.target.name] = e.target.value;
-  const stringifiedData = JSON.stringify(formData);
-  localStorage.setItem(STORAGE_KEY, stringifiedData);
+function submitForm(evt) {
+  evt.preventDefault();
+  evt.currentTarget.reset();
+  console.log(JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY)));
+  localStorage.removeItem(LOCALSTORAGE_KEY);
 }
 
-function populateTextarea() {
-  const savedMessage = JSON.parse(localStorage.getItem(STORAGE_KEY));
+function saveDataToLocStor(evt) {
+  const data = localStorage.getItem(LOCALSTORAGE_KEY);
+  const userData = data ? JSON.parse(data) : {};
+  userData[evt.target.name] = evt.target.value;
+  localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(userData));
+}
 
-  if (savedMessage === null) {
-    //console.log(savedMessage);
-    return;
-  }
-  refs.textarea.value = savedMessage['message'] || '';
-  refs.input.value = savedMessage['email'] || '';
+function refreshPage() {
+  const parsedData = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY));
+  if (!parsedData) return;
+  refs.email.value = parsedData.email || '';
+  refs.message.value = parsedData.message || '';
 }
 
 // refs.form.addEventListener('input', e => {

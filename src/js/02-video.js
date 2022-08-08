@@ -18,17 +18,8 @@ function resumePlayback() {
   }
   const paused = JSON.parse(localStorage.getItem(TIME_KEY))['seconds'];
   if (paused) {
-    player
-      .setCurrentTime(paused)
-      .then(function (seconds) {})
-      .catch(function (error) {
-        switch (error.name) {
-          case 'Error':
-            break;
-          default:
-            break;
-        }
-      });
+    player.setCurrentTime(paused).then(function (seconds) {});
   }
 }
+
 resumePlayback();
